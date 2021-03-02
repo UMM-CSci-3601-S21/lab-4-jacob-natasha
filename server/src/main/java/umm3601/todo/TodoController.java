@@ -29,6 +29,7 @@ public class TodoController {
   private static final String OWNER_KEY = "owner";
   private static final String BODY_KEY = "body";
   private static final String CATEGORY_KEY = "category";
+  private static final String STATUS_KEY = "status";
 
   private final JacksonMongoCollection<Todo> todoCollection;
 
@@ -78,6 +79,16 @@ public class TodoController {
 
     if (ctx.queryParamMap().containsKey(CATEGORY_KEY)) {
       filters.add(regex(CATEGORY_KEY, Pattern.quote(ctx.queryParam(CATEGORY_KEY)), "i"));
+    }
+
+    if (ctx.queryParamMap().containsKey(STATUS_KEY)) {
+      boolean targetStatus = ctx.queryParam(STATUS_KEY, Boolean.class).get();
+      filters.add(eq(STATUS_KEY, targetStatus));
+    }
+
+    // ?Might work when searching the body, but could have unexpected behavior
+    if (ctx.queryParamMap().containsKey(BODY_KEY)) {
+      filters.add(regex(BODY_KEY, Pattern.quote(ctx.queryParam(BODY_KEY)), "i"));
     }
 
     String sortBy = ctx.queryParam("sortby", "status");

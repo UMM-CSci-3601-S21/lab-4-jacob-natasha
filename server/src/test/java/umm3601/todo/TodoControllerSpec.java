@@ -47,7 +47,7 @@ public class TodoControllerSpec {
 
   private TodoController todoController;
 
-  private ObjectId frysTodoId; // May need to change
+  private ObjectId frysTodoId;
 
   static MongoClient mongoClient;
   static MongoDatabase db;
@@ -79,13 +79,13 @@ public class TodoControllerSpec {
     // every time that I save, so they do not look pretty.
     testTodos.add(new Document().append("owner", "Fry").append("status", false).append("category", "software design")
         .append("body", "This is a test of the body."));
-    testTodos.add(new Document().append("owner", "Blanche").append("status", true).append("category", "video games")
+    testTodos.add(new Document().append("owner", "Blanche").append("status", true).append("category", "groceries")
         .append("body", "This is another test of the body, but with extra text."));
     testTodos.add(new Document().append("owner", "Barry").append("status", true).append("category", "homework")
         .append("body", "Yet another test of the body, but with even more extra text that goes even longer!"));
 
     frysTodoId = new ObjectId();
-    Document fry = new Document().append("_id", frysTodoId).append("owner", "Fry").append("status", "true")
+    Document fry = new Document().append("_id", frysTodoId).append("owner", "Fry").append("status", true)
         .append("category", "homework").append("body", "This is frysTodoId body text.");
 
     todoDocuments.insertMany(testTodos);
@@ -102,6 +102,205 @@ public class TodoControllerSpec {
 
   @Test
   public void GetAllTodos() throws IOException {
+
+    // Create a fake Javalin context
+    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos");
+    todoController.getTodos(ctx);
+
+    assertEquals(200, mockRes.getStatus());
+
+    String result = ctx.resultString();
+    assertEquals(db.getCollection("todos").countDocuments(), JavalinJson.fromJson(result, Todo[].class).length);
+  }
+
+  @Test
+  public void GetTodosByOwner() throws IOException {
+
+    // Set the query string to test with
+    mockReq.setQueryString("owner=Fry");
+
+    // Create our fake Javalin context
+    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos");
+
+    todoController.getTodos(ctx);
+
+    assertEquals(200, mockRes.getStatus());
+
+    String result = ctx.resultString();
+    Todo[] resultTodos = JavalinJson.fromJson(result, Todo[].class);
+
+    assertEquals(2, resultTodos.length); // Should have 2
+    for (Todo todo : resultTodos) {
+      assertEquals("Fry", todo.owner);
+    }
+  }
+
+  @Test
+  public void GetTodosByCategory() throws IOException {
+
+    // Set the query string to test with
+    mockReq.setQueryString("category=homework");
+
+    // Create our fake Javalin context
+    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos");
+
+    todoController.getTodos(ctx);
+
+    assertEquals(200, mockRes.getStatus());
+
+    String result = ctx.resultString();
+    Todo[] resultTodos = JavalinJson.fromJson(result, Todo[].class);
+
+    assertEquals(2, resultTodos.length); // Should have 2
+    for (Todo todo : resultTodos) {
+      assertEquals("homework", todo.category);
+    }
+  }
+
+  @Test
+  public void GetTodosByStatus() throws IOException {
+
+    // Set the query string to test with
+    mockReq.setQueryString("status=true");
+
+    // Create our fake Javalin context
+    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos");
+
+    todoController.getTodos(ctx);
+
+    assertEquals(200, mockRes.getStatus());
+
+    String result = ctx.resultString();
+    Todo[] resultTodos = JavalinJson.fromJson(result, Todo[].class);
+
+    assertEquals(3, resultTodos.length); // Should have 3
+    for (Todo todo : resultTodos) {
+      assertEquals(true, todo.status);
+    }
+  }
+
+  // !Broken, and I don't know why. Possibly the wrong exception
+  @Test
+  public void GetTodosWithIllegalStatus() throws IOException {
+
+    mockReq.setQueryString("status=ABCD");
+    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos");
+
+    // This should throw a 'BadRequestResponse' exception
+    assertThrows(BadRequestResponse.class, () -> {
+      todoController.getTodos(ctx);
+    });
+  }
+
+  /**
+   * Tests the filtering to see if the given keyword is in the body
+   *
+   * !Needs to be revised. keyWord isn't defined in Todos.java. Filtering by a
+   * !keyWord that is contained in the body might not be defined.
+   */
+  @Test
+  public void GetTodosByKeyWord() throws IOException {
+
+    // Set the query string to test with
+    mockReq.setQueryString("keyWord=another");
+
+    // Create our fake Javalin context
+    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos");
+
+    todoController.getTodos(ctx);
+
+    assertEquals(200, mockRes.getStatus());
+
+    String result = ctx.resultString();
+    Todo[] resultTodos = JavalinJson.fromJson(result, Todo[].class);
+
+    assertEquals(2, resultTodos.length); // Should have 2
+    for (Todo todo : resultTodos) {
+      assertTrue(todo.body.contains("another"));
+    }
+
+  }
+
+  @Test
+  public void GetTodosByOwnerAndCategory() throws IOException {
+
+    // Set the query string to test with
+    mockReq.setQueryString("owner=Blanche&category=groceries");
+
+    // Create our fake Javalin context
+    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos");
+
+    todoController.getTodos(ctx);
+
+    assertEquals(200, mockRes.getStatus());
+
+    String result = ctx.resultString();
+    Todo[] resultTodos = JavalinJson.fromJson(result, Todo[].class);
+
+    assertEquals(1, resultTodos.length); // Should have 1
+    for (Todo todo : resultTodos) {
+      assertEquals("Blanche", todo.owner);
+      assertEquals("groceries", todo.category);
+    }
+  }
+
+  @Test
+  public void GetTodosWithExistentId() throws IOException {
+
+    String testID = frysTodoId.toHexString();
+
+    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos/:id", ImmutableMap.of("id", testID));
+    todoController.getTodo(ctx);
+
+    assertEquals(200, mockRes.getStatus());
+
+    String result = ctx.resultString();
+    Todo resultTodo = JavalinJson.fromJson(result, Todo.class);
+
+    assertEquals(resultTodo._id, frysTodoId.toHexString());
+    assertEquals(resultTodo.owner, "Fry");
+  }
+
+  /**
+   * Testing a todo with a non-existent ID (meaning that the ID is in the correct
+   * form, but is not in the database)
+   *
+   * @throws IOException
+   */
+  @Test
+  public void GetTodosWithNonexistentId() throws IOException {
+
+    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos/:id",
+        ImmutableMap.of("id", "588935f5236b2d4ad76a1410"));
+
+    assertThrows(NotFoundResponse.class, () -> {
+      todoController.getTodo(ctx);
+    });
+  }
+
+  /**
+   * Testing a todo with a bad ID (meaning that the ID is not in the correct form)
+   */
+  @Test
+  public void GetTodosWithBadId() throws IOException {
+
+    // stub
+  }
+
+  @Test
+  public void AddTodo() throws IOException {
+
+    // stub
+  }
+
+  @Test
+  public void AddInvalidStatus() throws IOException {
+
+    // stub
+  }
+
+  @Test
+  public void AddInvalidOwner() throws IOException {
 
     // stub
   }
