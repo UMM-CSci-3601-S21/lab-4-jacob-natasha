@@ -10,7 +10,7 @@ import com.mongodb.client.MongoDatabase;
 
 import io.javalin.Javalin;
 import io.javalin.core.util.RouteOverviewPlugin;
-
+import umm3601.todo.TodoController;
 import umm3601.user.UserController;
 
 public class Server {
@@ -25,27 +25,24 @@ public class Server {
     String databaseName = System.getenv().getOrDefault("MONGO_DB", "dev");
 
     // Setup the MongoDB client object with the information we set earlier
-    MongoClient mongoClient
-      = MongoClients.create(MongoClientSettings
-        .builder()
-        .applyToClusterSettings(builder -> builder.hosts(Arrays.asList(new ServerAddress(mongoAddr))))
-        .build());
+    MongoClient mongoClient = MongoClients.create(MongoClientSettings.builder()
+        .applyToClusterSettings(builder -> builder.hosts(Arrays.asList(new ServerAddress(mongoAddr)))).build());
 
     // Get the database
     MongoDatabase database = mongoClient.getDatabase(databaseName);
 
     // Initialize dependencies
     UserController userController = new UserController(database);
+    TodoController todoController = new TodoController(database);
 
     Javalin server = Javalin.create(config -> {
       config.registerPlugin(new RouteOverviewPlugin("/api"));
     });
     /*
-     * We want to shut the `mongoClient` down if the server either
-     * fails to start, or when it's shutting down for whatever reason.
-     * Since the mongClient needs to be available throughout the
-     * life of the server, the only way to do this is to wait for
-     * these events and close it then.
+     * We want to shut the `mongoClient` down if the server either fails to start,
+     * or when it's shutting down for whatever reason. Since the mongClient needs to
+     * be available throughout the life of the server, the only way to do this is to
+     * wait for these events and close it then.
      */
     server.events(event -> {
       event.serverStartFailed(mongoClient::close);
@@ -69,6 +66,16 @@ public class Server {
     // Add new user with the user info being in the JSON body
     // of the HTTP request
     server.post("/api/users", userController::addNewUser);
+
+    // List todos, filtered using query parameters
+    server.get("/api/todos", todoController::getTodos);
+
+    // Get the specified todo by id
+    server.get("/api/todos/:id", todoController::getTodo);
+
+    // Add new todo with the todo info being in the JSON body
+    // of the HTTP request
+    server.post("/api/todos", todoController::addNewTodo);
 
     server.exception(Exception.class, (e, ctx) -> {
       ctx.status(500);
