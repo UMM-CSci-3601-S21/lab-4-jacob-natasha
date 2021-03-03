@@ -106,7 +106,8 @@ public class TodoController {
   public void addNewTodo(Context ctx) {
     // Might need to change todo.status check to Complete or Incomplete
     Todo newTodo = ctx.bodyValidator(Todo.class).check(todo -> todo.owner != null && todo.owner.length() > 0)
-        .check(todo -> todo.category != null && todo.category.length() > 0).check(todo -> todo.status == true || false)
+        .check(todo -> todo.category != null && todo.category.length() > 0)
+        .check(todo -> (todo.status == true) || (todo.status == false))
         .check(todo -> todo.body != null && todo.body.length() > 0).get();
 
     todoCollection.insertOne(newTodo);

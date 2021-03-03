@@ -296,15 +296,13 @@ public class TodoControllerSpec {
   /**
    * Tests the TodoController's ability to add a new todo.
    *
-   * !Does not currently work. The body of the testNewTodo object is seen as null.
-   *
    * @throws IOException
    */
   @Test
   public void AddTodo() throws IOException {
 
     String testNewTodo = "{" + "\"owner\": \"Barry\"," + "\"status\": false," + "\"category\": \"groceries\","
-        + "\"body\": \"Pick up some milk, eggs, and cheese from the store. \"" + "}";
+        + "\"body\": \"Pick up some milk, eggs, and cheese from the store.\"" + "}";
 
     mockReq.setBodyContent(testNewTodo);
     mockReq.setMethod("POST");
