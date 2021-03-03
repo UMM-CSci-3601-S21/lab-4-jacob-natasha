@@ -27,7 +27,6 @@ import io.javalin.http.NotFoundResponse;
 public class TodoController {
 
   private static final String OWNER_KEY = "owner";
-  private static final String BODY_KEY = "body";
   private static final String CATEGORY_KEY = "category";
   private static final String STATUS_KEY = "status";
 
