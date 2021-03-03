@@ -93,11 +93,6 @@ public class TodoController {
       filters.add(eq(STATUS_KEY, targetStatus));
     }
 
-    // ?Might work when searching the body, but could have unexpected behavior
-    if (ctx.queryParamMap().containsKey(BODY_KEY)) {
-      filters.add(regex(BODY_KEY, Pattern.quote(ctx.queryParam(BODY_KEY)), "i"));
-    }
-
     String sortBy = ctx.queryParam("sortby", "status");
     String sortOrder = ctx.queryParam("sortorder", "desc");
 

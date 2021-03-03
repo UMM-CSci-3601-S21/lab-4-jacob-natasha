@@ -191,35 +191,6 @@ public class TodoControllerSpec {
     });
   }
 
-  /**
-   * Tests the filtering to see if the given keyword is in the body
-   *
-   * !Needs to be revised. keyWord isn't defined in Todos.java. Filtering by a
-   * !keyWord that is contained in the body might not be defined.
-   */
-  @Test
-  public void GetTodosByKeyWord() throws IOException {
-
-    // Set the query string to test with
-    mockReq.setQueryString("keyWord=another");
-
-    // Create our fake Javalin context
-    Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos");
-
-    todoController.getTodos(ctx);
-
-    assertEquals(200, mockRes.getStatus());
-
-    String result = ctx.resultString();
-    Todo[] resultTodos = JavalinJson.fromJson(result, Todo[].class);
-
-    assertEquals(2, resultTodos.length); // Should have 2
-    for (Todo todo : resultTodos) {
-      assertTrue(todo.body.contains("another"));
-    }
-
-  }
-
   @Test
   public void GetTodosByOwnerAndCategory() throws IOException {
 
