@@ -82,7 +82,14 @@ public class TodoController {
     }
 
     if (ctx.queryParamMap().containsKey(STATUS_KEY)) {
-      boolean targetStatus = ctx.queryParam(STATUS_KEY, Boolean.class).get();
+      boolean targetStatus;
+      if ("true".equals(ctx.queryParam(STATUS_KEY))) {
+        targetStatus = true;
+      } else if ("false".equals(ctx.queryParam(STATUS_KEY))) {
+        targetStatus = false;
+      } else {
+        throw new BadRequestResponse("The given status is not a boolean.");
+      }
       filters.add(eq(STATUS_KEY, targetStatus));
     }
 

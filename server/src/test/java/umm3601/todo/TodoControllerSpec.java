@@ -179,11 +179,10 @@ public class TodoControllerSpec {
     }
   }
 
-  // !Broken, and I don't know why. Possibly the wrong exception
   @Test
   public void GetTodosWithIllegalStatus() throws IOException {
 
-    mockReq.setQueryString("status=ABCD");
+    mockReq.setQueryString("status=notABoolean");
     Context ctx = ContextUtil.init(mockReq, mockRes, "api/todos");
 
     // This should throw a 'BadRequestResponse' exception
