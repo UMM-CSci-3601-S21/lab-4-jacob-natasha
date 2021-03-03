@@ -13,12 +13,14 @@ export class TodoService {
 
   constructor(private httpClient: HttpClient) { }
 
-  //! Needs to filter by keyWord contained in the body
-  getTodos(filters?: { owner?: string; category?: string}): Observable<Todo[]> {
+  getTodos(filters?: { owner?: string; status?: boolean; category?: string}): Observable<Todo[]> {
     let httpParams: HttpParams = new HttpParams();
     if (filters) {
       if (filters.owner) {
         httpParams = httpParams.set('owner', filters.owner);
+      }
+      if (filters.status) {
+        httpParams = httpParams.set('status', filters.status.toString());
       }
       if (filters.category) {
         httpParams = httpParams.set('category', filters.category);
@@ -34,7 +36,7 @@ export class TodoService {
   }
 
   //! Needs to filter by keyWord contained in the body
-  filterTodos(todos: Todo[], filters: {owner?: string; status?: boolean; category?: string}): Todo[] {
+  filterTodos(todos: Todo[], filters: {owner?: string; body?: string; category?: string}): Todo[] {
 
     let filteredTodos = todos;
 
@@ -53,6 +55,11 @@ export class TodoService {
     }
 
     // Filter by keyWord (eventually)
+    if (filters.body) {
+      filters.body = filters.body.toLowerCase();
+
+    }
+
 
     return filteredTodos;
   }
