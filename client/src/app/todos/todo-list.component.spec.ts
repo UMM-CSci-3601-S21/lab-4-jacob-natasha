@@ -76,3 +76,45 @@ describe('Todo List', () => {
     expect(todoList.serverFilteredTodos.filter((todo: Todo) => todo.status === true).length).toBe(3);
   });
 });
+
+describe('Misbehaving Todo List', () => {
+
+  let todoList: TodoListComponent;
+  let fixture: ComponentFixture<TodoListComponent>;
+
+  let todoServiceStub: {
+    getTodos: () => Observable<Todo[]>;
+    getTodosFiltered: () => Observable<Todo[]>;
+  };
+
+  beforeEach(() => {
+
+    todoServiceStub = {
+      getTodos: () => new Observable(observer => {
+        observer.error('Error-prone observable');
+      }),
+      getTodosFiltered: () => new Observable(observer => {
+        observer.error('Error-prone observable');
+      })
+    };
+
+    TestBed.configureTestingModule({
+      imports: [COMMON_IMPORTS],
+      declarations: [ TodoListComponent ],
+      providers: [{ provide: TodoService, useValue: todoServiceStub }]
+    });
+  });
+
+  beforeEach(waitForAsync(() => {
+    TestBed.compileComponents().then(() => {
+      fixture = TestBed.createComponent(TodoListComponent);
+      todoList = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+  }));
+
+  it('Generates an error if we don\'t set up a TodoListService', () => {
+    // Since the observer throws an error, we don't expect todos to be defined
+    expect(todoList.serverFilteredTodos).toBeUndefined();
+  });
+});
