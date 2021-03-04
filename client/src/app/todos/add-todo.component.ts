@@ -46,23 +46,16 @@ export class AddTodoComponent implements OnInit {
   createForms() {
     this.addTodoForm = this.fb.group({
       owner: new FormControl('', Validators.compose([
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(50),
+        Validators.required, Validators.minLength(2), Validators.maxLength(50),
         (fc) => {
           if (fc.value.toLowerCase() === 'abc123' || fc.value.toLowerCase() === '123abc') {
             return ({existingOwner: true});
           } else {
             return null;
           }},])),
-      status: new FormControl('', Validators.compose([
-        Validators.required,
-        Validators.pattern('^(true|false)$'),
-      ])),
+      status: new FormControl('', Validators.compose([ Validators.required, Validators.pattern('^(true|false)$'), ])),
       category: new FormControl('', Validators.compose([
-        Validators.required,
-        Validators.minLength(5),
-        Validators.maxLength(50),
+        Validators.required, Validators.minLength(5), Validators.maxLength(50),
         (fc) => {
           if (fc.value.toLowerCase() === 'abc123' || fc.value.toLowerCase() === '123abc') {
             return ({existingCategory: true});
@@ -70,9 +63,7 @@ export class AddTodoComponent implements OnInit {
             return null;
           }},])),
       body: new FormControl('', Validators.compose([
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(500),
+        Validators.required, Validators.minLength(2), Validators.maxLength(500),
         (fc) => {
           if (fc.value.toLowerCase() === 'abc123' || fc.value.toLowerCase() === '123abc') {
             return ({existingBody: true});
