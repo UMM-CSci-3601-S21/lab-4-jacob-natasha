@@ -1,0 +1,36 @@
+.add-todo-fab {
+  position: fixed;
+  bottom: 15px;
+  right: 30px;
+}
+
+.mat-subheader {
+  font-family: serif;
+  font-weight: bolder;
+  font-size: larger;
+}
+.todo-nav-list {
+  padding: 15px;
+}
+
+
+.todo-list-item {
+  max-width: min-content;
+  border-radius: 15px;
+  border-style: ridge;
+  display: wrap;
+  margin: 15px;
+}
+
+.todo-list-owner {
+  font-family: cursive;
+  text-decoration: underline;
+  font-style: italic;
+  font-weight: 200;
+  font-size: 50px;
+}
+.todo-list-body {
+font-family: serif;
+font-size: 10px;
+width: auto;
+}
