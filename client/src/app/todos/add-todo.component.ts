@@ -29,6 +29,7 @@ export class AddTodoComponent implements OnInit {
     ],
 
     category: [
+      {type: 'required', message: 'Category is required'},
       {type: 'minlength', message: 'Category must be at least 5 characters long'},
       {type: 'maxlength', message: 'Category cannot be more than 50 characters long'}
     ],
@@ -43,7 +44,6 @@ export class AddTodoComponent implements OnInit {
   constructor(private fb: FormBuilder, private todoService: TodoService, private snackBar: MatSnackBar, private router: Router) { }
 
   createForms() {
-
     this.addTodoForm = this.fb.group({
       owner: new FormControl('', Validators.compose([
         Validators.required,
@@ -54,16 +54,13 @@ export class AddTodoComponent implements OnInit {
             return ({existingOwner: true});
           } else {
             return null;
-          }
-        },
-      ])),
-
-      status: new FormControl('Incomplete', Validators.compose([
+          }},])),
+      status: new FormControl('', Validators.compose([
         Validators.required,
-        Validators.pattern('^(complete|incomplete)$'),
+        Validators.pattern('^(true|false)$'),
       ])),
-
       category: new FormControl('', Validators.compose([
+        Validators.required,
         Validators.minLength(5),
         Validators.maxLength(50),
         (fc) => {
@@ -71,10 +68,7 @@ export class AddTodoComponent implements OnInit {
             return ({existingCategory: true});
           } else {
             return null;
-          }
-        },
-      ])),
-
+          }},])),
       body: new FormControl('', Validators.compose([
         Validators.required,
         Validators.minLength(2),
@@ -84,11 +78,8 @@ export class AddTodoComponent implements OnInit {
             return ({existingBody: true});
           } else {
             return null;
-          }
-        },
-      ])),
+          }},])),
     });
-
   }
 
   ngOnInit(): void {
@@ -97,7 +88,7 @@ export class AddTodoComponent implements OnInit {
 
   submitForm() {
     this.todoService.addTodo(this.addTodoForm.value).subscribe(newID => {
-      this.snackBar.open('Created Todo ' + this.addTodoForm.value.name, null, {
+      this.snackBar.open('Created Todo ' + this.addTodoForm.value.owner, null, {
         duration: 2000,
       });
       this.router.navigate(['/todos/', newID]);

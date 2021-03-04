@@ -90,14 +90,6 @@ describe('AddTodoComponent', () => {
     });
   });
 
-  describe('The category field', () => {
-    it('should allow empty values', () => {
-      const categoryControl = addTodoForm.controls.category;
-      categoryControl.setValue('');
-      expect(categoryControl.valid).toBeTruthy();
-    });
-  });
-
   describe('The status field', () => {
     let statusControl: AbstractControl;
 
@@ -111,13 +103,13 @@ describe('AddTodoComponent', () => {
       expect(statusControl.hasError('required')).toBeTruthy();
     });
 
-    it('should allow "complete"', () => {
-      statusControl.setValue('complete');
+    it('should allow "true"', () => {
+      statusControl.setValue('true');
       expect(statusControl.valid).toBeTruthy();
     });
 
-    it('should allow "incomplete"', () => {
-      statusControl.setValue('incomplete');
+    it('should allow "false"', () => {
+      statusControl.setValue('false');
       expect(statusControl.valid).toBeTruthy();
     });
 
