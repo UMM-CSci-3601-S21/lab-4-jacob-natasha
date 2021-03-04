@@ -19,8 +19,11 @@ export class TodoService {
       if (filters.owner) {
         httpParams = httpParams.set('owner', filters.owner);
       }
-      if (filters.status) {
-        httpParams = httpParams.set('status', filters.status.toString());
+      if (filters.status === true) {
+        httpParams = httpParams.set('status', 'true');
+      }
+      if (filters.status === false) {
+        httpParams = httpParams.set('status', 'false');
       }
       if (filters.category) {
         httpParams = httpParams.set('category', filters.category);
@@ -35,7 +38,6 @@ export class TodoService {
     return this.httpClient.get<Todo>(this.todoUrl + '/' + id);
   }
 
-  //! Needs to filter by keyWord contained in the body
   filterTodos(todos: Todo[], filters: {owner?: string; body?: string; category?: string}): Todo[] {
 
     let filteredTodos = todos;
@@ -54,13 +56,12 @@ export class TodoService {
       filteredTodos = filteredTodos.filter(todo => todo.category.toLowerCase().indexOf(filters.category) !== -1);
     }
 
-    // Filter by keyWord (eventually)
+    // Filter by a word contained in the body
     if (filters.body) {
       filters.body = filters.body.toLowerCase();
 
       filteredTodos = filteredTodos.filter(todo => todo.body.toLowerCase().indexOf(filters.body) !== -1);
     }
-
 
     return filteredTodos;
   }
