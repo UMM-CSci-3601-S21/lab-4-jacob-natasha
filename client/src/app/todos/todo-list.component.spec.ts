@@ -60,7 +60,19 @@ describe('Todo List', () => {
     });
   }));
 
-  it('should contain all the todos', () => {
+  it('Contains all the todos', () => {
     expect(todoList.serverFilteredTodos.length).toBe(4);
+  });
+
+  it('Contains a todo owned by Barry', () => {
+    expect(todoList.serverFilteredTodos.some((todo: Todo) => todo.owner === 'Barry')).toBe(true);
+  });
+
+  it('Doesn\'t contain a todo owned by George', () => {
+    expect(todoList.serverFilteredTodos.some((todo: Todo) => todo.owner === 'George')).toBe(false);
+  });
+
+  it('Has three todos that are complete', () => {
+    expect(todoList.serverFilteredTodos.filter((todo: Todo) => todo.status === true).length).toBe(3);
   });
 });

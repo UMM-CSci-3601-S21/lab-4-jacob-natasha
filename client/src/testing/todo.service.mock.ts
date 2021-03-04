@@ -9,7 +9,34 @@ import { TodoService } from '../app/todos/todo.service';
 @Injectable()
 export class MockTodoService extends TodoService {
   static testTodos: Todo[] = [
-    //stub
+    {
+      _id: 'Frys_id',
+      owner: 'Fry',
+      status: true,
+      category: 'video games',
+      body: 'Catch five fish in Animal Crossing'
+    },
+    {
+      _id: 'Barrys_id',
+      owner: 'Barry',
+      status: true,
+      category: 'video games',
+      body: 'Get all 120 stars in Super Mario 64'
+    },
+    {
+      _id: 'Blanches_id',
+      owner: 'Blanche',
+      status: true,
+      category: 'software design',
+      body: 'Finish lab 4'
+    },
+    {
+      _id: 'Workmans_id',
+      owner: 'Workman',
+      status: false,
+      category: 'groceries',
+      body: 'Get 4 frozen pizzas'
+    }
   ];
 
   constructor() {
